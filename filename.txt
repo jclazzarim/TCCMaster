@@ -1,0 +1,8 @@
+name = asdf 
+bootloader = "/usr/lib/xen-4.4/bin/pygrub" 
+vcpus = 1 
+maxvcpus = 2 
+memory = 1024 
+maxmem = 2048 
+disk = [ '/home/mauriverti/Documentos/magica/ubuntu.img,,xvda'] 
+vif = [ 'bridge=virbr0' ]
