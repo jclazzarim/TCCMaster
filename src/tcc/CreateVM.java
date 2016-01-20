@@ -13,6 +13,7 @@ import javax.swing.SpinnerNumberModel;
 
 public class CreateVM extends javax.swing.JFrame {
 
+//    private final String path = "/home/mauriverti/Documentos/magica";
     private final String path = "/home/server/Documentos/magica";
     private final Runnable run;
 
