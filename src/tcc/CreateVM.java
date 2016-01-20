@@ -6,6 +6,7 @@ package tcc;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.function.Consumer;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -13,8 +14,9 @@ import javax.swing.SpinnerNumberModel;
 public class CreateVM extends javax.swing.JFrame {
 
     private final String path = "/home/server/Documentos/magica";
+    private final Runnable run;
 
-    public CreateVM() {
+    public CreateVM(Runnable run) {
         initComponents();
 
         SpinnerNumberModel smVCPUMax = new SpinnerNumberModel();
@@ -40,6 +42,7 @@ public class CreateVM extends javax.swing.JFrame {
         smMem.setMaximum(2048);
         smMem.setValue(1024);
         vmMem.setModel(smMem);
+        this.run = run;
 
     }
 
@@ -244,7 +247,7 @@ public class CreateVM extends javax.swing.JFrame {
         config += "maxvcpus = " + vmVCPUMax.getValue().toString() + " \n";
         config += "memory = " + vmMem.getValue().toString() + " \n";
         config += "maxmem = " + vmMemMax.getValue().toString() + " \n";
-        config += "disk = [ '" + path + "/ubuntu.img,,xvda'] \n";
+        config += "disk = [ '" + path + "/vm.img,,xvda'] \n";
         config += "vif = [ 'bridge=virbr0' ]";
 
 //        System.out.println(config);
@@ -278,20 +281,20 @@ public class CreateVM extends javax.swing.JFrame {
         //</editor-fold>
 
         //</editor-fold>
-        //</editor-fold>
-        SpinnerModel smVCPUMax = new SpinnerNumberModel(3, 1, 8, 1);
-//                vmVCPUMax = new JSpinner(smVCPUMax);
-//                SpinnerModel smVCPU = new SpinnerNumberModel(2, 1, (int) vmVCPUMax.getValue(), 1);
-//                vmVCPU = new JSpinner(smVCPU);
-
-//                vmMem.setValue(1024);
-//                vmMemMax.setValue(1024);
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-
-                new CreateVM().setVisible(true);
-            }
-        });
+//        //</editor-fold>
+//        SpinnerModel smVCPUMax = new SpinnerNumberModel(3, 1, 8, 1);
+////                vmVCPUMax = new JSpinner(smVCPUMax);
+////                SpinnerModel smVCPU = new SpinnerNumberModel(2, 1, (int) vmVCPUMax.getValue(), 1);
+////                vmVCPU = new JSpinner(smVCPU);
+//
+////                vmMem.setValue(1024);
+////                vmMemMax.setValue(1024);
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//
+//                new CreateVM().setVisible(true);
+//            }
+//        });
     }
 
     private Boolean isConfigOk() {
@@ -334,6 +337,7 @@ public class CreateVM extends javax.swing.JFrame {
             }
 
             proc.waitFor();
+            run.run();
         } catch (Exception e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();

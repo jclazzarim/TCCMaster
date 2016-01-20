@@ -608,7 +608,7 @@ public class Tela extends javax.swing.JFrame {
 
         try {
             Process proc = Runtime.getRuntime().exec(command);
-
+            
         } catch (Exception e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
@@ -733,7 +733,7 @@ public class Tela extends javax.swing.JFrame {
         atualizar(); */
         
         
-        CreateVM createVM = new CreateVM();
+        CreateVM createVM = new CreateVM(()->{atualizar();});
         createVM.setLocationRelativeTo(null);    
         createVM.setVisible(true);
 
