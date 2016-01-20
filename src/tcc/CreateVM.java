@@ -6,18 +6,17 @@ package tcc;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.function.Consumer;
 import javax.swing.JOptionPane;
-import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 public class CreateVM extends javax.swing.JFrame {
 
 //    private final String path = "/home/mauriverti/Documentos/magica";
-    private final String path = "/home/server/Documentos/magica";
-    private final Runnable run;
+    private final String path = "/home/server/Documentos/magica/";
+    private final Runnable atualizaTela;
+    private final IPreencheValoreBase valores;
 
-    public CreateVM(Runnable run) {
+    public CreateVM(Runnable run, IPreencheValoreBase valores) {
         initComponents();
 
         SpinnerNumberModel smVCPUMax = new SpinnerNumberModel();
@@ -43,7 +42,8 @@ public class CreateVM extends javax.swing.JFrame {
         smMem.setMaximum(2048);
         smMem.setValue(1024);
         vmMem.setModel(smMem);
-        this.run = run;
+        this.atualizaTela = run;
+        this.valores = valores;
 
     }
 
@@ -254,7 +254,8 @@ public class CreateVM extends javax.swing.JFrame {
         config += "disk = [ '" + diskPath + ",,xvda'] \n";
         config += "vif = [ 'bridge=virbr0' ]";
 
-//        System.out.println(config);
+        valores.setParam(vmVCPUMax.getValue().toString(), vmMemMax.getValue().toString());
+        System.out.println(config);
 //        SALVAR ARQUIVO
         salvaConfig(config);
 
@@ -363,7 +364,7 @@ public class CreateVM extends javax.swing.JFrame {
             }
 
             proc.waitFor();
-            run.run();
+            atualizaTela.run();
         } catch (Exception e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();

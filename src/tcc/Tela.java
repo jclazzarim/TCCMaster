@@ -26,6 +26,28 @@ public class Tela extends javax.swing.JFrame {
 
     public Tela() {
         initComponents();
+        
+        new Thread(() -> {
+            int x = 0;
+            try (ServerSocket server = new ServerSocket(portEntrada)) {
+                System.out.println(++x);
+                while (true) {
+                    Socket client = server.accept();
+
+                    ThreadServer vm = new ThreadServer(client);
+                    vm.start();
+
+                    Thread.sleep(1000);
+                    System.out.println(vm.getEntrada());
+                    vms.put(vm.getEntrada(), vm);
+
+                }
+            } catch (IOException ioE) {
+                System.out.println("Problemas em criar socket Server, porta ocupada?");
+            } catch (Exception e) {
+                System.out.println("Problemas em criar socket Server");
+            }
+        }).start();
     }
 
     Controller controller = new Controller();
@@ -733,7 +755,10 @@ public class Tela extends javax.swing.JFrame {
         atualizar(); */
         
         
-        CreateVM createVM = new CreateVM(()->{atualizar();});
+        CreateVM createVM = new CreateVM(()->{atualizar();}, (maxCPU, maxMemo)->{
+            System.out.println(maxCPU);
+            System.out.println(maxMemo);
+        });
         createVM.setLocationRelativeTo(null);    
         createVM.setVisible(true);
 
@@ -831,36 +856,14 @@ public class Tela extends javax.swing.JFrame {
 
         /* Create and display the fonullrm */
         java.awt.EventQueue.invokeLater(() -> {
-            
             Tela t = new Tela();
             t.setLocationRelativeTo(null);  
             t.setVisible(true);
         });
         
         
-        new Thread(() -> {
-            int x = 0;
-            try (ServerSocket server = new ServerSocket(portEntrada)) {
-                System.out.println(++x);
-                while (true) {
-                    Socket client = server.accept();
-
-                    ThreadServer vm = new ThreadServer(client);
-                    vm.start();
-
-                    Thread.sleep(1000);
-                    System.out.println(vm.getEntrada());
-                    vms.put(vm.getEntrada(), vm);
-
-                }
-            } catch (IOException ioE) {
-                System.out.println("Problemas em criar socket Server, porta ocupada?");
-            } catch (Exception e) {
-                System.out.println("Problemas em criar socket Server");
-            }
-        }).start();
         
-        System.out.println("saiu thread");
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
