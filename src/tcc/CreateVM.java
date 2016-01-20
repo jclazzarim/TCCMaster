@@ -66,6 +66,7 @@ public class CreateVM extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(300, 225));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
@@ -125,7 +126,7 @@ public class CreateVM extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCreateVM)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
                         .addComponent(btnCancel))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelNome)
@@ -235,6 +236,8 @@ public class CreateVM extends javax.swing.JFrame {
 
     private void btnCreateVMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateVMActionPerformed
 
+        String diskPath = createImg(vmName.getText());
+        
         if (!isConfigOk()) {
             return;
         }
@@ -247,7 +250,7 @@ public class CreateVM extends javax.swing.JFrame {
         config += "maxvcpus = " + vmVCPUMax.getValue().toString() + " \n";
         config += "memory = " + vmMem.getValue().toString() + " \n";
         config += "maxmem = " + vmMemMax.getValue().toString() + " \n";
-        config += "disk = [ '" + path + "/vm.img,,xvda'] \n";
+        config += "disk = [ '" + diskPath + ",,xvda'] \n";
         config += "vif = [ 'bridge=virbr0' ]";
 
 //        System.out.println(config);
@@ -305,6 +308,29 @@ public class CreateVM extends javax.swing.JFrame {
 
         return true;
     }
+    
+     private String createImg(String name) {
+        
+        String vmName = "vm";
+        String vmExtension = ".img";
+        
+        String vmPath = path + vmName + name + vmExtension;
+        
+        String command = "cp " + path + vmName + vmExtension + " " + vmPath;
+
+        Process proc;
+        try {
+            proc = Runtime.getRuntime().exec(command);
+
+            proc.waitFor();
+        } catch (Exception e) {
+            System.out.println("Erro em create new VM");
+            e.printStackTrace();
+        }
+        
+        return vmPath;
+    }
+
 
     private void salvaConfig(String config) {
         try {
@@ -316,7 +342,6 @@ public class CreateVM extends javax.swing.JFrame {
             System.out.println("Impossivel criar arquivo de configuracoes");
             e.printStackTrace();
         }
-
     }
 
     private void startVM() {
