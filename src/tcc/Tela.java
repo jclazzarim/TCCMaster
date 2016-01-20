@@ -737,6 +737,7 @@ public class Tela extends javax.swing.JFrame {
         createVM.setLocationRelativeTo(null);    
         createVM.setVisible(true);
 
+        atualizar();
     }//GEN-LAST:event_btnNovoActionPerformed
 
     public Integer getSelectVMId(){
