@@ -1,49 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package tcc;
-
-import java.util.HashMap;
-import java.util.Random;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.UIManager;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-
 /**
- *
  * @author mauriverti
  */
+
+package tcc;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import org.jfree.data.xy.XYSeries;
+
 public class Tela extends javax.swing.JFrame {
 
-    private HashMap<String, Runnable> mapThreads = new HashMap<>();
-    private static final String name = "VM";
-    private static Integer id = 0;
+//    private HashMap<String, Runnable> mapThreads = new HashMap<>();
+//    private static final String name = "VM";
+//    private static Integer id = 0;
+    
+        public static Integer portEntrada = 8910;
+    public final static Map<String, ThreadServer> vms = new HashMap<>();
 
-    /**
-     * Creates new form Tela
-     */
     public Tela() {
         initComponents();
-
-//        vmList.addListSelectionListener((ListSelectionEvent e) -> {
-//            VirtualMachineStarter element = (VirtualMachineStarter) vmList.getModel().getElementAt(e.getFirstIndex());
-//            element.setCpuListener((Integer t) -> {
-//                System.out.println("Cpu:" + t);
-//            });
-//
-//            element.setMemoListener(t -> {
-//                System.out.println("Memo:" + t);
-//            });
-//
-//        });
     }
 
     Controller controller = new Controller();
@@ -609,8 +591,31 @@ public class Tela extends javax.swing.JFrame {
     }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-//        
+     
+       Integer vmID = this.getSelectVMId();
+      
+        if (vmID == null || vmID < 0) {
+            JOptionPane.showMessageDialog(null, "Nenhuma VM Selecionada");
+            return;
+        }
+        
+        if (vmID == 0) {
+            JOptionPane.showMessageDialog(null, "Não é possível remover Domain-0");
+            return;
+        }
+        
+        String command = "sudo xl shutdown " + vmID;
 
+        try {
+            Process proc = Runtime.getRuntime().exec(command);
+
+        } catch (Exception e) {
+            System.out.println("Erro em create new VM");
+            e.printStackTrace();
+        }
+        
+        atualizar();
+/****
         controller.atualizarDstat();
 //        XYSeries serie = new XYSeries("Desempenho");
 //        serie.add(1,1);
@@ -655,7 +660,7 @@ public class Tela extends javax.swing.JFrame {
          serie2.add(2, 2);
          serie2.add(3, 1);
          serie2.add(4, 2);
-         serie2.add(5, 3);*/
+         serie2.add(5, 3);
         XYSeriesCollection dataSet = new XYSeriesCollection();
         dataSet.addSeries(serieMem);
         dataSet.addSeries(serieVCPU);
@@ -678,7 +683,7 @@ public class Tela extends javax.swing.JFrame {
         this.pnlDesempenho.revalidate();
         this.pnlDesempenho.repaint();
 
-
+*/
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
@@ -715,8 +720,7 @@ public class Tela extends javax.swing.JFrame {
 
     private void jTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTesteActionPerformed
 
-        SQliteJDBC bd = new SQliteJDBC();
-        bd.createDB();
+        getSelectVMId();
 
     }//GEN-LAST:event_jTesteActionPerformed
 
@@ -735,6 +739,39 @@ public class Tela extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnNovoActionPerformed
 
+    public Integer getSelectVMId(){
+        
+        Object selectedItem = this.vmList.getSelectedValue();
+        
+        Integer vmID = selectedItem == null ? null : new Integer(selectedItem.toString().split(" ")[0]);
+        
+        return vmID;
+    }
+    
+    public void changeMemValue(Integer vmID, Integer qtdMem) {
+        String command = "sudo xl mem-set " + vmID + " " + qtdMem;
+
+        try {
+            Process proc = Runtime.getRuntime().exec(command);
+
+        } catch (Exception e) {
+            System.out.println("Erro em alocar memória: mem-set " + vmID + " " + qtdMem);
+            e.printStackTrace();
+        }
+    }
+    
+    public void changeVCPUValue(Integer vmID, Integer qtdVCPU) {
+        String command = "sudo xl vcpu-set " + vmID + " " + qtdVCPU;
+
+        try {
+            Process proc = Runtime.getRuntime().exec(command);
+
+        } catch (Exception e) {
+            System.out.println("Erro em alocar vcpu: vcpu-set " + vmID + " " + qtdVCPU);
+            e.printStackTrace();
+        }
+    }
+    
     public XYSeries setaLimites(XYSeries serie, String nome, Integer valor) {
         serie = new XYSeries(nome);
         for (int i = 1; i <= this.amostras; i++) {
@@ -798,6 +835,31 @@ public class Tela extends javax.swing.JFrame {
             t.setLocationRelativeTo(null);  
             t.setVisible(true);
         });
+        
+        
+        new Thread(() -> {
+            int x = 0;
+            try (ServerSocket server = new ServerSocket(portEntrada)) {
+                System.out.println(++x);
+                while (true) {
+                    Socket client = server.accept();
+
+                    ThreadServer vm = new ThreadServer(client);
+                    vm.start();
+
+                    Thread.sleep(1000);
+                    System.out.println(vm.getEntrada());
+                    vms.put(vm.getEntrada(), vm);
+
+                }
+            } catch (IOException ioE) {
+                System.out.println("Problemas em criar socket Server, porta ocupada?");
+            } catch (Exception e) {
+                System.out.println("Problemas em criar socket Server");
+            }
+        }).start();
+        
+        System.out.println("saiu thread");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

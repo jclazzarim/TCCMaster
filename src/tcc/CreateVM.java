@@ -1,7 +1,6 @@
 /**
  * @author mauriverti
  */
-
 package tcc;
 
 import java.io.BufferedReader;
@@ -13,9 +12,11 @@ import javax.swing.SpinnerNumberModel;
 
 public class CreateVM extends javax.swing.JFrame {
 
+    private final String path = "/home/server/Documentos/magica";
+
     public CreateVM() {
         initComponents();
-        
+
         SpinnerNumberModel smVCPUMax = new SpinnerNumberModel();
         smVCPUMax.setMinimum(1);
         smVCPUMax.setMaximum(32);
@@ -33,13 +34,13 @@ public class CreateVM extends javax.swing.JFrame {
         smMemMax.setMaximum(32768);       // 32Gb
         smMemMax.setValue(2048);
         vmMemMax.setModel(smMemMax);
-        
+
         SpinnerNumberModel smMem = new SpinnerNumberModel();
         smMem.setMinimum(512);
         smMem.setMaximum(2048);
         smMem.setValue(1024);
         vmMem.setModel(smMem);
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -58,6 +59,8 @@ public class CreateVM extends javax.swing.JFrame {
         vmVCPUMax = new javax.swing.JSpinner();
         vmMem = new javax.swing.JSpinner();
         vmMemMax = new javax.swing.JSpinner();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -106,6 +109,10 @@ public class CreateVM extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Mb");
+
+        jLabel2.setText("Mb");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -115,7 +122,7 @@ public class CreateVM extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCreateVM)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                         .addComponent(btnCancel))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelNome)
@@ -132,11 +139,15 @@ public class CreateVM extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelMemMax)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(vmMemMax, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE))
+                        .addComponent(vmMemMax))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelMem)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vmMem)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -157,11 +168,13 @@ public class CreateVM extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelMem)
-                    .addComponent(vmMem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vmMem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelMemMax)
-                    .addComponent(vmMemMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vmMemMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCreateVM)
@@ -178,20 +191,21 @@ public class CreateVM extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void vmVCPUMaxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_vmVCPUMaxStateChanged
-        
+
         SpinnerNumberModel smVCPU = new SpinnerNumberModel();
         smVCPU.setMinimum(1);
         Integer maxAtual = new Integer(vmVCPUMax.getValue().toString());
         Integer cpuAtual = new Integer(vmVCPU.getValue().toString());
         smVCPU.setMaximum(maxAtual);
-        if (maxAtual >= cpuAtual)
+        if (maxAtual >= cpuAtual) {
             smVCPU.setValue(vmVCPU.getValue());         // usado pra manter o valor atual; eh gambiarra mas eh assim
-        else
+        } else {
             smVCPU.setValue(maxAtual);
-            
+        }
+
         vmVCPU.setModel(smVCPU);
-        
-        
+
+
     }//GEN-LAST:event_vmVCPUMaxStateChanged
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -200,46 +214,48 @@ public class CreateVM extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosed
 
     private void vmMemMaxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_vmMemMaxStateChanged
-        
+
         SpinnerNumberModel smMem = new SpinnerNumberModel();
         smMem.setMinimum(512);
         Integer maxAtual = new Integer(vmMemMax.getValue().toString());
         Integer cpuAtual = new Integer(vmMem.getValue().toString());
         smMem.setMaximum(maxAtual);
-        if (maxAtual >= cpuAtual)
+        if (maxAtual >= cpuAtual) {
             smMem.setValue(vmMem.getValue());         // usado pra manter o valor atual; eh gambiarra mas eh assim
-        else
+        } else {
             smMem.setValue(maxAtual);
-            
+        }
+
         vmMem.setModel(smMem);
-        
+
     }//GEN-LAST:event_vmMemMaxStateChanged
 
     private void btnCreateVMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateVMActionPerformed
-        
+
         if (!isConfigOk()) {
             return;
         }
-        
+
         String config = "";
-        
+
         config += "name = \"" + vmName.getText() + "\" \n";
-        config += "bootloader = \"/usr/lib/xen-4.4/bin/pygrub\" \n";
+        config += "bootloader = \"pygrub\" \n";
         config += "vcpus = " + vmVCPU.getValue().toString() + " \n";
         config += "maxvcpus = " + vmVCPUMax.getValue().toString() + " \n";
         config += "memory = " + vmMem.getValue().toString() + " \n";
         config += "maxmem = " + vmMemMax.getValue().toString() + " \n";
-        config += "disk = [ '/home/mauriverti/Documentos/magica/ubuntu.img,,xvda'] \n";
+        config += "disk = [ '" + path + "/ubuntu.img,,xvda'] \n";
         config += "vif = [ 'bridge=virbr0' ]";
 
 //        System.out.println(config);
-        
 //        SALVAR ARQUIVO
         salvaConfig(config);
-                
+
 //        ARRUAMR START
         startVM();
         
+        this.dispose();
+
     }//GEN-LAST:event_btnCreateVMActionPerformed
 
     public static void main(String args[]) {
@@ -260,41 +276,36 @@ public class CreateVM extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
-        //</editor-fold>
-        //</editor-fold>
 
-                SpinnerModel smVCPUMax = new SpinnerNumberModel(3, 1, 8, 1);
+        //</editor-fold>
+        //</editor-fold>
+        SpinnerModel smVCPUMax = new SpinnerNumberModel(3, 1, 8, 1);
 //                vmVCPUMax = new JSpinner(smVCPUMax);
 //                SpinnerModel smVCPU = new SpinnerNumberModel(2, 1, (int) vmVCPUMax.getValue(), 1);
 //                vmVCPU = new JSpinner(smVCPU);
 
 //                vmMem.setValue(1024);
 //                vmMemMax.setValue(1024);
-                
-                
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                
-                
-                
+
                 new CreateVM().setVisible(true);
             }
         });
     }
-    
+
     private Boolean isConfigOk() {
         if (vmName.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "É necessário informar um nome para a VM");
             return false;
         }
-        
+
         return true;
     }
-    
+
     private void salvaConfig(String config) {
         try {
-            PrintWriter out = new PrintWriter("/home/mauriverti/Documentos/vmConfig.cfg");
+            PrintWriter out = new PrintWriter(path + "/vmConfig.cfg");
             out.print(config);
             out.flush();
             out.close();
@@ -302,13 +313,13 @@ public class CreateVM extends javax.swing.JFrame {
             System.out.println("Impossivel criar arquivo de configuracoes");
             e.printStackTrace();
         }
-        
+
     }
-    
+
     private void startVM() {
-        
+
         String command;
-        command = "sudo xl create /home/mauriverti/Documentos/vmConfig.cfg";
+        command = "sudo xl create " + path + "/vmConfig.cfg";
 
         Process proc;
         try {
@@ -327,12 +338,14 @@ public class CreateVM extends javax.swing.JFrame {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
         }
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateVM;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel labelMem;
     private javax.swing.JLabel labelMemMax;
     private javax.swing.JLabel labelNome;
