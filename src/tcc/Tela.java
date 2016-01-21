@@ -25,7 +25,9 @@ public class Tela extends javax.swing.JFrame {
     public final static Map<String, ThreadServer> vms = new HashMap<>();
 
     public Tela() {
+        
         initComponents();
+        atualizar();
         
         new Thread(() -> {
             int x = 0;
@@ -69,52 +71,52 @@ public class Tela extends javax.swing.JFrame {
         pnlDesempenho = new javax.swing.JPanel();
         pnlPropriedades = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        tfVmId = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jSlider1 = new javax.swing.JSlider();
+        vcpuSpinner = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jSlider2 = new javax.swing.JSlider();
+        memorySpinner = new javax.swing.JSlider();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        manualApplyChanges = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        hMemMaxLimit = new javax.swing.JTextField();
+        hVcpuMaxLimit = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        horizontalCheckBox = new javax.swing.JCheckBox();
         jLabel17 = new javax.swing.JLabel();
-        jTextField8 = new javax.swing.JTextField();
-        jTextField9 = new javax.swing.JTextField();
+        hMemMinLimit = new javax.swing.JTextField();
+        hVcpuMinLimit = new javax.swing.JTextField();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        verticalCheckBox = new javax.swing.JCheckBox();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
+        vMemMaxLimit = new javax.swing.JTextField();
+        vVcpuMaxLimit = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
+        memQtdAlocacao = new javax.swing.JTextField();
+        vcpuQtdAlocacao = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        jTextField10 = new javax.swing.JTextField();
+        vMemMinLimit = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
-        jTextField11 = new javax.swing.JTextField();
+        memQtdDesalocacao = new javax.swing.JTextField();
         jLabel22 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
-        jTextField12 = new javax.swing.JTextField();
+        vVcpuMinLimit = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
-        jTextField13 = new javax.swing.JTextField();
+        vcpuQtdDesalocacao = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        automaticApplyChanges = new javax.swing.JButton();
         jTeste = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -141,6 +143,11 @@ public class Tela extends javax.swing.JFrame {
         });
 
         vmList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        vmList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                vmListValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(vmList);
 
         javax.swing.GroupLayout pnlDesempenhoLayout = new javax.swing.GroupLayout(pnlDesempenho);
@@ -158,17 +165,17 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel1.setText("ID:");
 
-        jTextField1.setEditable(false);
-        jTextField1.setText("1");
-        jTextField1.setToolTipText("");
-        jTextField1.setEnabled(false);
-        jTextField1.setPreferredSize(new java.awt.Dimension(70, 27));
+        tfVmId.setEditable(false);
+        tfVmId.setText("0");
+        tfVmId.setToolTipText("");
+        tfVmId.setEnabled(false);
+        tfVmId.setPreferredSize(new java.awt.Dimension(70, 27));
 
         jLabel4.setText("Min");
 
-        jSlider1.setMaximum(4);
-        jSlider1.setMinimum(1);
-        jSlider1.setValue(2);
+        vcpuSpinner.setMaximum(4);
+        vcpuSpinner.setMinimum(1);
+        vcpuSpinner.setValue(2);
 
         jLabel2.setText("VCPU:");
 
@@ -176,15 +183,15 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel5.setText("Max");
 
-        jSlider2.setMaximum(2048);
-        jSlider2.setMinimum(512);
-        jSlider2.setValue(2048);
+        memorySpinner.setMaximum(2048);
+        memorySpinner.setMinimum(512);
+        memorySpinner.setValue(2048);
 
         jLabel6.setText("Memória");
 
         jLabel7.setText("Min");
 
-        jButton1.setText("Aplicar Alterações");
+        manualApplyChanges.setText("Aplicar Alterações");
 
         javax.swing.GroupLayout pnlPropriedadesLayout = new javax.swing.GroupLayout(pnlPropriedades);
         pnlPropriedades.setLayout(pnlPropriedadesLayout);
@@ -196,14 +203,14 @@ public class Tela extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel4)
                         .addGap(1, 1, 1)
-                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vcpuSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel7)
                         .addGap(1, 1, 1)
-                        .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(memorySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel5))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
@@ -213,13 +220,13 @@ public class Tela extends javax.swing.JFrame {
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(tfVmId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(manualApplyChanges, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(203, Short.MAX_VALUE))
         );
         pnlPropriedadesLayout.setVerticalGroup(
@@ -228,7 +235,7 @@ public class Tela extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfVmId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addGap(61, 61, 61)
@@ -238,7 +245,7 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vcpuSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addGap(25, 25, 25)
                                 .addComponent(jLabel4)))))
@@ -251,12 +258,12 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(memorySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                                 .addGap(25, 25, 25)
                                 .addComponent(jLabel7)))))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(manualApplyChanges)
                 .addContainerGap(187, Short.MAX_VALUE))
         );
 
@@ -266,14 +273,14 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel8.setText("Alocar uma nova máquina virtual quando limites atingirem:");
 
-        jTextField2.setText("70");
-        jTextField2.setEnabled(false);
+        hMemMaxLimit.setText("70");
+        hMemMaxLimit.setEnabled(false);
 
-        jTextField3.setText("60");
-        jTextField3.setEnabled(false);
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        hVcpuMaxLimit.setText("60");
+        hVcpuMaxLimit.setEnabled(false);
+        hVcpuMaxLimit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                hVcpuMaxLimitActionPerformed(evt);
             }
         });
 
@@ -281,23 +288,23 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel10.setText("% de CPU");
 
-        jCheckBox1.setText("Ativo");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        horizontalCheckBox.setText("Ativo");
+        horizontalCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                horizontalCheckBoxActionPerformed(evt);
             }
         });
 
         jLabel17.setText("Desalocar uma nova máquina virtual quando limites atingirem:");
 
-        jTextField8.setText("40");
-        jTextField8.setEnabled(false);
+        hMemMinLimit.setText("40");
+        hMemMinLimit.setEnabled(false);
 
-        jTextField9.setText("45");
-        jTextField9.setEnabled(false);
-        jTextField9.addActionListener(new java.awt.event.ActionListener() {
+        hVcpuMinLimit.setText("45");
+        hVcpuMinLimit.setEnabled(false);
+        hVcpuMinLimit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField9ActionPerformed(evt);
+                hVcpuMinLimitActionPerformed(evt);
             }
         });
 
@@ -315,8 +322,8 @@ public class Tela extends javax.swing.JFrame {
                     .addComponent(jLabel8)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                            .addComponent(jTextField2))
+                            .addComponent(hVcpuMaxLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                            .addComponent(hMemMaxLimit))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
@@ -324,12 +331,12 @@ public class Tela extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(1, 1, 1)
                                 .addComponent(jLabel9))))
-                    .addComponent(jCheckBox1)
+                    .addComponent(horizontalCheckBox)
                     .addComponent(jLabel17)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField9)
-                            .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(hVcpuMinLimit)
+                            .addComponent(hMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
@@ -342,33 +349,33 @@ public class Tela extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jCheckBox1)
+                .addComponent(horizontalCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hMemMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hVcpuMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(8, 8, 8)
                 .addComponent(jLabel17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(""), "Vertical"));
 
-        jCheckBox2.setText("Ativo");
-        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+        verticalCheckBox.setText("Ativo");
+        verticalCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox2ActionPerformed(evt);
+                verticalCheckBoxActionPerformed(evt);
             }
         });
 
@@ -376,21 +383,21 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel12.setText("Quando a carga no CPU for maior que");
 
-        jTextField4.setText("70");
-        jTextField4.setEnabled(false);
+        vMemMaxLimit.setText("70");
+        vMemMaxLimit.setEnabled(false);
 
-        jTextField5.setText("60");
-        jTextField5.setEnabled(false);
+        vVcpuMaxLimit.setText("60");
+        vVcpuMaxLimit.setEnabled(false);
 
         jLabel13.setText("%, alocar");
 
         jLabel14.setText("%, alocar");
 
-        jTextField6.setText("128");
-        jTextField6.setEnabled(false);
+        memQtdAlocacao.setText("128");
+        memQtdAlocacao.setEnabled(false);
 
-        jTextField7.setText("1");
-        jTextField7.setEnabled(false);
+        vcpuQtdAlocacao.setText("1");
+        vcpuQtdAlocacao.setEnabled(false);
 
         jLabel15.setText("MB");
 
@@ -398,30 +405,30 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel20.setText("Quando a carga na memória for menor que");
 
-        jTextField10.setText("50");
-        jTextField10.setEnabled(false);
-        jTextField10.addActionListener(new java.awt.event.ActionListener() {
+        vMemMinLimit.setText("50");
+        vMemMinLimit.setEnabled(false);
+        vMemMinLimit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField10ActionPerformed(evt);
+                vMemMinLimitActionPerformed(evt);
             }
         });
 
         jLabel21.setText("%, desalocar");
 
-        jTextField11.setText("128");
-        jTextField11.setEnabled(false);
+        memQtdDesalocacao.setText("128");
+        memQtdDesalocacao.setEnabled(false);
 
         jLabel22.setText("MB");
 
         jLabel23.setText("Quando a carga no CPU for menor que");
 
-        jTextField12.setText("40");
-        jTextField12.setEnabled(false);
+        vVcpuMinLimit.setText("40");
+        vVcpuMinLimit.setEnabled(false);
 
         jLabel24.setText("%, alocar");
 
-        jTextField13.setText("1");
-        jTextField13.setEnabled(false);
+        vcpuQtdDesalocacao.setText("1");
+        vcpuQtdDesalocacao.setEnabled(false);
 
         jLabel25.setText("Core");
 
@@ -432,95 +439,94 @@ public class Tela extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox2)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel11)
                                 .addGap(2, 2, 2)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(vMemMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel13)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(memQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel12)
                                 .addGap(6, 6, 6)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(vVcpuMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(vcpuQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel16)
-                                .addGap(55, 55, 55)))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel16)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(memQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel22)))))
                         .addGap(46, 46, 46)
                         .addComponent(jLabel15))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(verticalCheckBox)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel23)
-                                .addGap(6, 6, 6)
-                                .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel23)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(vcpuQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel20)
+                                        .addGap(2, 2, 2)
+                                        .addComponent(vMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel21)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel20)
-                                .addGap(2, 2, 2)
-                                .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel21)))
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(17, 17, 17)
-                                .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel22))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel25)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jLabel25)))
+                        .addContainerGap())))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jCheckBox2)
+                .addComponent(verticalCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vMemMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel13)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(memQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vVcpuMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel14)
                     .addComponent(jLabel16)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vcpuQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20)
-                    .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel21)
-                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(memQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel23)
-                        .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel24)
                         .addComponent(jLabel25))
-                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vcpuQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
-        jButton2.setText("Aplicar Alterações");
+        automaticApplyChanges.setText("Aplicar Alterações");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -535,9 +541,11 @@ public class Tela extends javax.swing.JFrame {
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(156, 156, 156)
-                                .addComponent(jButton2)))
+                                .addComponent(automaticApplyChanges)))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -548,7 +556,7 @@ public class Tela extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(automaticApplyChanges)
                 .addContainerGap())
         );
 
@@ -708,37 +716,37 @@ public class Tela extends javax.swing.JFrame {
 */
     }//GEN-LAST:event_btnExcluirActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void hVcpuMaxLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hVcpuMaxLimitActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_hVcpuMaxLimitActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        jTextField2.setEnabled(jCheckBox1.isSelected());
-        jTextField3.setEnabled(jCheckBox1.isSelected());
-        jTextField8.setEnabled(jCheckBox1.isSelected());
-        jTextField9.setEnabled(jCheckBox1.isSelected());
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    private void horizontalCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_horizontalCheckBoxActionPerformed
+        hMemMaxLimit.setEnabled(horizontalCheckBox.isSelected());
+        hVcpuMaxLimit.setEnabled(horizontalCheckBox.isSelected());
+        hMemMinLimit.setEnabled(horizontalCheckBox.isSelected());
+        hVcpuMinLimit.setEnabled(horizontalCheckBox.isSelected());
+    }//GEN-LAST:event_horizontalCheckBoxActionPerformed
 
-    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void verticalCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verticalCheckBoxActionPerformed
 
-        jTextField4.setEnabled(jCheckBox2.isSelected());
-        jTextField5.setEnabled(jCheckBox2.isSelected());
-        jTextField6.setEnabled(jCheckBox2.isSelected());
-        jTextField7.setEnabled(jCheckBox2.isSelected());
-        jTextField10.setEnabled(jCheckBox2.isSelected());
-        jTextField11.setEnabled(jCheckBox2.isSelected());
-        jTextField12.setEnabled(jCheckBox2.isSelected());
-        jTextField13.setEnabled(jCheckBox2.isSelected());
+        vMemMaxLimit.setEnabled(verticalCheckBox.isSelected());
+        vVcpuMaxLimit.setEnabled(verticalCheckBox.isSelected());
+        memQtdAlocacao.setEnabled(verticalCheckBox.isSelected());
+        vcpuQtdAlocacao.setEnabled(verticalCheckBox.isSelected());
+        vMemMinLimit.setEnabled(verticalCheckBox.isSelected());
+        memQtdDesalocacao.setEnabled(verticalCheckBox.isSelected());
+        vVcpuMinLimit.setEnabled(verticalCheckBox.isSelected());
+        vcpuQtdDesalocacao.setEnabled(verticalCheckBox.isSelected());
 
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }//GEN-LAST:event_verticalCheckBoxActionPerformed
 
-    private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed
+    private void hVcpuMinLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hVcpuMinLimitActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField9ActionPerformed
+    }//GEN-LAST:event_hVcpuMinLimitActionPerformed
 
-    private void jTextField10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField10ActionPerformed
+    private void vMemMinLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vMemMinLimitActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField10ActionPerformed
+    }//GEN-LAST:event_vMemMinLimitActionPerformed
 
     private void jTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTesteActionPerformed
 
@@ -765,6 +773,20 @@ public class Tela extends javax.swing.JFrame {
         atualizar();
     }//GEN-LAST:event_btnNovoActionPerformed
 
+    private void vmListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_vmListValueChanged
+        
+        Integer vmId = getSelectVMId();
+        
+        tfVmId.setText(vmId.toString());
+        
+        if (vmId == 36)
+            setVMManualSettings(1024, 2048, 2, 2);
+        
+        if (vmId == 38)
+            setVMManualSettings(2048, 2048, 2, 4);
+        
+    }//GEN-LAST:event_vmListValueChanged
+
     public Integer getSelectVMId(){
         
         Object selectedItem = this.vmList.getSelectedValue();
@@ -772,6 +794,13 @@ public class Tela extends javax.swing.JFrame {
         Integer vmID = selectedItem == null ? null : new Integer(selectedItem.toString().split(" ")[0]);
         
         return vmID;
+    }
+    
+    public void setVMManualSettings(Integer memoAtual, Integer memoMax, Integer vcpuAtual, Integer vcpuMax) {
+        this.memorySpinner.setValue(memoAtual);
+        this.memorySpinner.setMaximum(memoMax);
+        this.vcpuSpinner.setValue(vcpuAtual);
+        this.vcpuSpinner.setMaximum(vcpuMax);
     }
     
     public void changeMemValue(Integer vmID, Integer qtdMem) {
@@ -855,8 +884,18 @@ public class Tela extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the fonullrm */
+            try {
+//                UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+//                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            } catch (Exception e) {
+                System.out.println("Problema em aplicar look and feel");
+            }
         java.awt.EventQueue.invokeLater(() -> {
             Tela t = new Tela();
+            
             t.setLocationRelativeTo(null);  
             t.setVisible(true);
         });
@@ -867,13 +906,15 @@ public class Tela extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton automaticApplyChanges;
     private javax.swing.JButton btnAtualizar;
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnNovo;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JTextField hMemMaxLimit;
+    private javax.swing.JTextField hMemMinLimit;
+    private javax.swing.JTextField hVcpuMaxLimit;
+    private javax.swing.JTextField hVcpuMinLimit;
+    private javax.swing.JCheckBox horizontalCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -903,25 +944,23 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSlider jSlider1;
-    private javax.swing.JSlider jSlider2;
     private javax.swing.JButton jTeste;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField10;
-    private javax.swing.JTextField jTextField11;
-    private javax.swing.JTextField jTextField12;
-    private javax.swing.JTextField jTextField13;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
-    private javax.swing.JTextField jTextField8;
-    private javax.swing.JTextField jTextField9;
+    private javax.swing.JButton manualApplyChanges;
+    private javax.swing.JTextField memQtdAlocacao;
+    private javax.swing.JTextField memQtdDesalocacao;
+    private javax.swing.JSlider memorySpinner;
     private javax.swing.JTabbedPane painel;
     private javax.swing.JPanel pnlDesempenho;
     private javax.swing.JPanel pnlPropriedades;
+    private javax.swing.JTextField tfVmId;
+    private javax.swing.JTextField vMemMaxLimit;
+    private javax.swing.JTextField vMemMinLimit;
+    private javax.swing.JTextField vVcpuMaxLimit;
+    private javax.swing.JTextField vVcpuMinLimit;
+    private javax.swing.JTextField vcpuQtdAlocacao;
+    private javax.swing.JTextField vcpuQtdDesalocacao;
+    private javax.swing.JSlider vcpuSpinner;
+    private javax.swing.JCheckBox verticalCheckBox;
     private javax.swing.JList vmList;
     // End of variables declaration//GEN-END:variables
 }

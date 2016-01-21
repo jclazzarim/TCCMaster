@@ -191,7 +191,6 @@ public class CreateVM extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -214,7 +213,6 @@ public class CreateVM extends javax.swing.JFrame {
     }//GEN-LAST:event_vmVCPUMaxStateChanged
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-
         this.dispose();
     }//GEN-LAST:event_formWindowClosed
 
@@ -237,11 +235,11 @@ public class CreateVM extends javax.swing.JFrame {
 
     private void btnCreateVMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateVMActionPerformed
 
-        String diskPath = createImg(vmName.getText());
-        
         if (!isConfigOk()) {
             return;
         }
+        
+        String diskPath = createImg(vmName.getText());
 
         String config = "";
 
