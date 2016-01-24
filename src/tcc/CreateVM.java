@@ -4,6 +4,7 @@
 package tcc;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import javax.swing.JOptionPane;
@@ -42,6 +43,14 @@ public class CreateVM extends javax.swing.JFrame {
         smMem.setMaximum(2048);
         smMem.setValue(1024);
         vmMem.setModel(smMem);
+        
+        SpinnerNumberModel smIP = new SpinnerNumberModel();
+        smIP.setMinimum(2);
+        smIP.setMaximum(254);
+        smIP.setValue(2);
+        vmIP.setModel(smIP);
+        
+        
         this.atualizaTela = run;
         this.valores = valores;
 
@@ -65,6 +74,8 @@ public class CreateVM extends javax.swing.JFrame {
         vmMemMax = new javax.swing.JSpinner();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        labelIP = new javax.swing.JLabel();
+        vmIP = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(300, 225));
@@ -118,6 +129,8 @@ public class CreateVM extends javax.swing.JFrame {
 
         jLabel2.setText("Mb");
 
+        labelIP.setText("IP:            192.168.122.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -125,6 +138,10 @@ public class CreateVM extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(labelIP)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vmIP))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCreateVM)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
@@ -180,7 +197,11 @@ public class CreateVM extends javax.swing.JFrame {
                     .addComponent(labelMemMax)
                     .addComponent(vmMemMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelIP)
+                    .addComponent(vmIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCreateVM)
                     .addComponent(btnCancel))
@@ -252,7 +273,7 @@ public class CreateVM extends javax.swing.JFrame {
         config += "disk = [ '" + diskPath + ",,xvda'] \n";
         config += "vif = [ 'bridge=virbr0' ]";
 
-        valores.setParam(vmVCPUMax.getValue().toString(), vmMemMax.getValue().toString());
+        valores.setParam(vmVCPUMax.getValue().toString(), vmMemMax.getValue().toString(), vmIP.getValue().toString());
         System.out.println(config);
 //        SALVAR ARQUIVO
         salvaConfig(config);
@@ -263,42 +284,6 @@ public class CreateVM extends javax.swing.JFrame {
         this.dispose();
 
     }//GEN-LAST:event_btnCreateVMActionPerformed
-
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CreateVM.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        //</editor-fold>
-//        //</editor-fold>
-//        SpinnerModel smVCPUMax = new SpinnerNumberModel(3, 1, 8, 1);
-////                vmVCPUMax = new JSpinner(smVCPUMax);
-////                SpinnerModel smVCPU = new SpinnerNumberModel(2, 1, (int) vmVCPUMax.getValue(), 1);
-////                vmVCPU = new JSpinner(smVCPU);
-//
-////                vmMem.setValue(1024);
-////                vmMemMax.setValue(1024);
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//
-//                new CreateVM().setVisible(true);
-//            }
-//        });
-    }
 
     private Boolean isConfigOk() {
         if (vmName.getText().isEmpty()) {
@@ -323,7 +308,7 @@ public class CreateVM extends javax.swing.JFrame {
             proc = Runtime.getRuntime().exec(command);
 
             proc.waitFor();
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
         }
@@ -333,11 +318,11 @@ public class CreateVM extends javax.swing.JFrame {
 
 
     private void salvaConfig(String config) {
-        try {
-            PrintWriter out = new PrintWriter(path + "/vmConfig.cfg");
+        try (PrintWriter out = new PrintWriter(path + "/vmConfig.cfg")) {
+            
             out.print(config);
             out.flush();
-            out.close();
+            
         } catch (Exception e) {
             System.out.println("Impossivel criar arquivo de configuracoes");
             e.printStackTrace();
@@ -355,7 +340,7 @@ public class CreateVM extends javax.swing.JFrame {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-            String line = "";
+            String line;
 
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
@@ -363,7 +348,7 @@ public class CreateVM extends javax.swing.JFrame {
 
             proc.waitFor();
             atualizaTela.run();
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
         }
@@ -375,11 +360,13 @@ public class CreateVM extends javax.swing.JFrame {
     private javax.swing.JButton btnCreateVM;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel labelIP;
     private javax.swing.JLabel labelMem;
     private javax.swing.JLabel labelMemMax;
     private javax.swing.JLabel labelNome;
     private javax.swing.JLabel labelVCPU;
     private javax.swing.JLabel labelVCPUMax;
+    private javax.swing.JSpinner vmIP;
     private javax.swing.JSpinner vmMem;
     private javax.swing.JSpinner vmMemMax;
     private javax.swing.JTextField vmName;

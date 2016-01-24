@@ -1,48 +1,59 @@
 /**
  * @author mauriverti
  */
-
 package tcc;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import org.jfree.data.xy.XYSeries;
 
 public class Tela extends javax.swing.JFrame {
 
-//    private HashMap<String, Runnable> mapThreads = new HashMap<>();
-//    private static final String name = "VM";
-//    private static Integer id = 0;
-    
-        public static Integer portEntrada = 8910;
-    public final static Map<String, ThreadServer> vms = new HashMap<>();
+    public static Integer portEntrada = 8910;
+    public final static DefaultListModel<ThreadServer> listModel = new DefaultListModel<>();
 
     public Tela() {
-        
+
         initComponents();
         atualizar();
-        
+
+        listModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                atualizar();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                atualizar();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                atualizar();
+            }
+        });
+
         new Thread(() -> {
             int x = 0;
             try (ServerSocket server = new ServerSocket(portEntrada)) {
-                System.out.println(++x);
                 while (true) {
                     Socket client = server.accept();
-
                     ThreadServer vm = new ThreadServer(client);
                     vm.start();
-
                     Thread.sleep(1000);
-                    System.out.println(vm.getEntrada());
-                    vms.put(vm.getEntrada(), vm);
-
+                    listModel.addElement(vm);
+                    vmList.setModel(listModel);
                 }
             } catch (IOException ioE) {
                 System.out.println("Problemas em criar socket Server, porta ocupada?");
@@ -50,13 +61,12 @@ public class Tela extends javax.swing.JFrame {
                 System.out.println("Problemas em criar socket Server");
             }
         }).start();
+
     }
 
     Controller controller = new Controller();
     JButton btn = new JButton();
     final Integer amostras = 50;
-    //Integer limiteMaximo = 70;
-    //Integer limiteMinimo = 30;
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -616,104 +626,86 @@ public class Tela extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAtualizarActionPerformed
 
     private void atualizar() {
-        controller.atualizaLista(this.vmList);
-        this.jScrollPane1.updateUI();
+//        controller.atualizaLista(this.vmList);
+        vmList.validate();
+        vmList.repaint();
+        jScrollPane1.repaint();
+        jScrollPane1.revalidate();
     }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-     
-       Integer vmID = this.getSelectVMId();
-      
+
+        Integer vmID = this.getSelectVMId();
+
         if (vmID == null || vmID < 0) {
             JOptionPane.showMessageDialog(null, "Nenhuma VM Selecionada");
             return;
         }
-        
+
         if (vmID == 0) {
             JOptionPane.showMessageDialog(null, "Não é possível remover Domain-0");
             return;
         }
-        
+
         String command = "sudo xl shutdown " + vmID;
 
         try {
             Process proc = Runtime.getRuntime().exec(command);
-            
+
         } catch (Exception e) {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
         }
-        
+
         atualizar();
-/****
-        controller.atualizarDstat();
-//        XYSeries serie = new XYSeries("Desempenho");
-//        serie.add(1,1);
-//        serie.add(2,2);
-//        serie.add(3,3);
-//        serie.add(4,2);
-//        serie.add(5,1);
-//        
-//        XYSeriesCollection dataSet = new XYSeriesCollection();
-//        dataSet.addSeries(serie);
-//        
-//        JFreeChart chart = ChartFactory.createXYLineChart("grafico", "Tempo", "% de uso", dataSet, PlotOrientation.VERTICAL, true, true, false);
-////        ChartFrame panel = new ChartFrame("grafico",chart);
-////        
-////        panel.setVisible(true);
-////        panel.setSize(400,400);
-//        
-//        this.pnlDesempenho = new JPanel();
-//        this.pnlDesempenho.setLayout(new java.awt.BorderLayout());
-//        
-//        ChartPanel panel = new ChartPanel(chart);
-//        
-//        this.pnlDesempenho.add(panel, BorderLayout.CENTER);
-//        this.pnlDesempenho.validate();
-
-        XYSeries serieMem = new XYSeries("Memoria");
-        serieMem = setaSerie(serieMem, "Memoria", 50, 4);
-        XYSeries serieVCPU = new XYSeries("VCPU");
-        serieVCPU = setaSerie(serieVCPU, "VCPU", 40, 4);
-        XYSeries limiteMinimo = new XYSeries("Limite M&iacute;nimo");
-        limiteMinimo = setaLimites(limiteMinimo, "Limite Mínimo", 30);
-        XYSeries limiteMaximo = new XYSeries("Limite Máximo");
-        limiteMaximo = setaLimites(limiteMaximo, "Limite Maximo", 70);
-
-        /*serie.add(1, 1);
-         serie.add(2, 2);
-         serie.add(3, 3);
-         serie.add(4, 2);
-         serie.add(5, 1);
-        
-         serie2.add(1, 3);
-         serie2.add(2, 2);
-         serie2.add(3, 1);
-         serie2.add(4, 2);
-         serie2.add(5, 3);
-        XYSeriesCollection dataSet = new XYSeriesCollection();
-        dataSet.addSeries(serieMem);
-        dataSet.addSeries(serieVCPU);
-        dataSet.addSeries(limiteMinimo);
-        dataSet.addSeries(limiteMaximo);
-
-        JFreeChart chart = ChartFactory.createXYLineChart("Gráfico", "Tempo", "% de uso", dataSet, PlotOrientation.VERTICAL, true, true, false);
-//        ChartFrame panel = new ChartFrame("grafico",chart);
-//        
-//        panel.setVisible(true);
-//        panel.setSize(400,400);
-//
-//        this.pnlDesempenho = new JPanel();
-
-        ChartPanel panel = new ChartPanel(chart);
-
-        this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho, BoxLayout.LINE_AXIS));
-        this.pnlDesempenho.add(panel);
-
-        this.pnlDesempenho.revalidate();
-        this.pnlDesempenho.repaint();
-
-*/
+        /**
+         * **
+         * controller.atualizarDstat(); // XYSeries serie = new
+         * XYSeries("Desempenho"); // serie.add(1,1); // serie.add(2,2); //
+         * serie.add(3,3); // serie.add(4,2); // serie.add(5,1); // //
+         * XYSeriesCollection dataSet = new XYSeriesCollection(); //
+         * dataSet.addSeries(serie); // // JFreeChart chart =
+         * ChartFactory.createXYLineChart("grafico", "Tempo", "% de uso",
+         * dataSet, PlotOrientation.VERTICAL, true, true, false); ////
+         * ChartFrame panel = new ChartFrame("grafico",chart); //// ////
+         * panel.setVisible(true); //// panel.setSize(400,400); // //
+         * this.pnlDesempenho = new JPanel(); //
+         * this.pnlDesempenho.setLayout(new java.awt.BorderLayout()); // //
+         * ChartPanel panel = new ChartPanel(chart); // //
+         * this.pnlDesempenho.add(panel, BorderLayout.CENTER); //
+         * this.pnlDesempenho.validate();
+         *
+         * XYSeries serieMem = new XYSeries("Memoria"); serieMem =
+         * setaSerie(serieMem, "Memoria", 50, 4); XYSeries serieVCPU = new
+         * XYSeries("VCPU"); serieVCPU = setaSerie(serieVCPU, "VCPU", 40, 4);
+         * XYSeries limiteMinimo = new XYSeries("Limite M&iacute;nimo");
+         * limiteMinimo = setaLimites(limiteMinimo, "Limite Mínimo", 30);
+         * XYSeries limiteMaximo = new XYSeries("Limite Máximo"); limiteMaximo =
+         * setaLimites(limiteMaximo, "Limite Maximo", 70);
+         *
+         * /*serie.add(1, 1); serie.add(2, 2); serie.add(3, 3); serie.add(4,
+         * 2); serie.add(5, 1);
+         *
+         * serie2.add(1, 3); serie2.add(2, 2); serie2.add(3, 1); serie2.add(4,
+         * 2); serie2.add(5, 3); XYSeriesCollection dataSet = new
+         * XYSeriesCollection(); dataSet.addSeries(serieMem);
+         * dataSet.addSeries(serieVCPU); dataSet.addSeries(limiteMinimo);
+         * dataSet.addSeries(limiteMaximo);
+         *
+         * JFreeChart chart = ChartFactory.createXYLineChart("Gráfico", "Tempo",
+         * "% de uso", dataSet, PlotOrientation.VERTICAL, true, true, false); //
+         * ChartFrame panel = new ChartFrame("grafico",chart); // //
+         * panel.setVisible(true); // panel.setSize(400,400); // //
+         * this.pnlDesempenho = new JPanel();
+         *
+         * ChartPanel panel = new ChartPanel(chart);
+         *
+         * this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho,
+         * BoxLayout.LINE_AXIS)); this.pnlDesempenho.add(panel);
+         *
+         * this.pnlDesempenho.revalidate(); this.pnlDesempenho.repaint();
+         *
+         */
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void hVcpuMaxLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hVcpuMaxLimitActionPerformed
@@ -761,48 +753,43 @@ public class Tela extends javax.swing.JFrame {
         vm.start();
 
         atualizar(); */
-        
-        
-        CreateVM createVM = new CreateVM(()->{atualizar();}, (maxCPU, maxMemo)->{
+        CreateVM createVM = new CreateVM(() -> {
+            atualizar();
+        }, (maxCPU, maxMemo, ip) -> {
             System.out.println(maxCPU);
             System.out.println(maxMemo);
+            System.out.println(ip);
         });
-        createVM.setLocationRelativeTo(null);    
+        createVM.setLocationRelativeTo(null);
         createVM.setVisible(true);
 
         atualizar();
     }//GEN-LAST:event_btnNovoActionPerformed
 
     private void vmListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_vmListValueChanged
-        
-        Integer vmId = getSelectVMId();
-        
+
+        Integer vmId = evt.getFirstIndex();
+
         tfVmId.setText(vmId.toString());
-        
-        if (vmId == 36)
-            setVMManualSettings(1024, 2048, 2, 2);
-        
-        if (vmId == 38)
-            setVMManualSettings(2048, 2048, 2, 4);
-        
+
     }//GEN-LAST:event_vmListValueChanged
 
-    public Integer getSelectVMId(){
-        
+    public Integer getSelectVMId() {
+
         Object selectedItem = this.vmList.getSelectedValue();
-        
+
         Integer vmID = selectedItem == null ? null : new Integer(selectedItem.toString().split(" ")[0]);
-        
+
         return vmID;
     }
-    
+
     public void setVMManualSettings(Integer memoAtual, Integer memoMax, Integer vcpuAtual, Integer vcpuMax) {
         this.memorySpinner.setValue(memoAtual);
         this.memorySpinner.setMaximum(memoMax);
         this.vcpuSpinner.setValue(vcpuAtual);
         this.vcpuSpinner.setMaximum(vcpuMax);
     }
-    
+
     public void changeMemValue(Integer vmID, Integer qtdMem) {
         String command = "sudo xl mem-set " + vmID + " " + qtdMem;
 
@@ -814,7 +801,7 @@ public class Tela extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     public void changeVCPUValue(Integer vmID, Integer qtdVCPU) {
         String command = "sudo xl vcpu-set " + vmID + " " + qtdVCPU;
 
@@ -826,7 +813,7 @@ public class Tela extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     public XYSeries setaLimites(XYSeries serie, String nome, Integer valor) {
         serie = new XYSeries(nome);
         for (int i = 1; i <= this.amostras; i++) {
@@ -884,25 +871,22 @@ public class Tela extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the fonullrm */
-            try {
+        try {
 //                UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 //                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 //                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 //                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-            } catch (Exception e) {
-                System.out.println("Problema em aplicar look and feel");
-            }
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+        } catch (Exception e) {
+            System.out.println("Problema em aplicar look and feel");
+        }
         java.awt.EventQueue.invokeLater(() -> {
             Tela t = new Tela();
-            
-            t.setLocationRelativeTo(null);  
+
+            t.setLocationRelativeTo(null);
             t.setVisible(true);
         });
-        
-        
-        
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

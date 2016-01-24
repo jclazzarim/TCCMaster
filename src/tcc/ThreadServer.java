@@ -77,4 +77,11 @@ public class ThreadServer extends Thread {
     public String getEntrada() {
         return entrada;
     }
+
+    @Override
+    public String toString() {
+        return getEntrada();
+    }
+    
+    
 }

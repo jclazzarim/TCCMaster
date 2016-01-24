@@ -6,6 +6,7 @@
 package tcc;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +33,8 @@ public class Controller {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-            String line = "";
-            List<String> vmsInfo = new ArrayList<String>();
+            String line;
+            List<String> vmsInfo = new ArrayList<>();
 
             while ((line = reader.readLine()) != null) {
                 vmsInfo.add(line);
@@ -43,12 +44,12 @@ public class Controller {
 
             server = new VM(vmsInfo.get(1));
 
-            vms = new ArrayList<VM>();
+            vms = new ArrayList<>();
             for (int i = 2; i < vmsInfo.size(); i++) {
                 VM vm = new VM(vmsInfo.get(i));
                 vms.add(vm);
             }
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             System.out.println("Erro ao tentar Atualizar");
         }
@@ -106,11 +107,11 @@ public class Controller {
 
     void atualizaListaFake(JList vmList, HashMap<String, Runnable> mapThreads) {
         DefaultListModel model = new DefaultListModel();
-        
+
         mapThreads.entrySet().stream().forEach((entry) -> {
             model.addElement(entry.getValue());
         });
-        
+
         vmList.setModel(model);
     }
 }
