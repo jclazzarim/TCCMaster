@@ -12,6 +12,13 @@ package tcc;
 @FunctionalInterface
 public interface IPreencheValoreBase {
     
-    public void setParam(String maxCPU, String maxMemo, String ip);
+    public void setParam(
+            String name,
+            String ip,
+            String vcpu,
+            String maxVCPU,
+            String memory,
+            String maxMemory
+    );
     
 }

@@ -4,6 +4,7 @@
 package tcc;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -53,7 +54,6 @@ public class CreateVM extends javax.swing.JFrame {
         
         this.atualizaTela = run;
         this.valores = valores;
-
     }
 
     @SuppressWarnings("unchecked")
@@ -260,26 +260,39 @@ public class CreateVM extends javax.swing.JFrame {
             return;
         }
         
-        String diskPath = createImg(vmName.getText());
+//        String diskPath = createImg(vmName.getText());
 
-        String config = "";
+        String config = " sudo  xen-create-image " +
+        " --hostname " + vmName.getText() +
+        " --ip 192.168.122." + vmIP.getValue().toString() +
+        " --nopasswd" +
+        " --dir /home/server/Documentos/magica/hds/" +
+        " --force " +
+        " --install-method=copy " +
+        " --install-source=/home/server/Documentos/magica/IMAGEM_OFICIAL/montada/ " +
+        " --noswap " +
+        " --genpass=0 " +
+        " --memory=" + vmMem.getValue().toString() + "MB" +
+        " --maxmem=" + vmMemMax.getValue().toString() + "MB" +
+        " --vcpus=" + vmVCPU.getValue().toString() + " ";
 
-        config += "name = \"" + vmName.getText() + "\" \n";
-        config += "bootloader = \"pygrub\" \n";
-        config += "vcpus = " + vmVCPU.getValue().toString() + " \n";
-        config += "maxvcpus = " + vmVCPUMax.getValue().toString() + " \n";
-        config += "memory = " + vmMem.getValue().toString() + " \n";
-        config += "maxmem = " + vmMemMax.getValue().toString() + " \n";
-        config += "disk = [ '" + diskPath + ",,xvda'] \n";
-        config += "vif = [ 'bridge=virbr0' ]";
+        valores.setParam(
+                vmName.getText(),
+                vmIP.getValue().toString(),
+                vmVCPU.getValue().toString(),
+                vmVCPUMax.getValue().toString(),
+                vmMem.getValue().toString(),
+                vmMemMax.getValue().toString()
+        );
+        
+//        CRIAR ARQUIVO DE CONFIGURACAO DA VM
+        createConfig(config);
+        
+//        ADICIONA AO ARQUIVO O NUMERO DE VCPU MAXIMO
+        alterarConfig(vmName.getText());
 
-        valores.setParam(vmVCPUMax.getValue().toString(), vmMemMax.getValue().toString(), vmIP.getValue().toString());
-        System.out.println(config);
-//        SALVAR ARQUIVO
-        salvaConfig(config);
-
-//        ARRUAMR START
-        startVM();
+//        INICIA A VM
+        startVM(vmName.getText());
         
         this.dispose();
 
@@ -293,46 +306,11 @@ public class CreateVM extends javax.swing.JFrame {
 
         return true;
     }
-    
-     private String createImg(String name) {
-        
-        String vmName = "vm";
-        String vmExtension = ".img";
-        
-        String vmPath = path + vmName + name + vmExtension;
-        
-        String command = "cp " + path + vmName + vmExtension + " " + vmPath;
 
-        Process proc;
-        try {
-            proc = Runtime.getRuntime().exec(command);
-
-            proc.waitFor();
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Erro em create new VM");
-            e.printStackTrace();
-        }
-        
-        return vmPath;
-    }
-
-
-    private void salvaConfig(String config) {
-        try (PrintWriter out = new PrintWriter(path + "/vmConfig.cfg")) {
-            
-            out.print(config);
-            out.flush();
-            
-        } catch (Exception e) {
-            System.out.println("Impossivel criar arquivo de configuracoes");
-            e.printStackTrace();
-        }
-    }
-
-    private void startVM() {
+    private void startVM(String hostname) {
 
         String command;
-        command = "sudo xl create " + path + "/vmConfig.cfg";
+        command = "sudo xl create " + path + "configs/" + hostname + ".cfg";
 
         Process proc;
         try {
@@ -352,7 +330,6 @@ public class CreateVM extends javax.swing.JFrame {
             System.out.println("Erro em create new VM");
             e.printStackTrace();
         }
-
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -373,4 +350,60 @@ public class CreateVM extends javax.swing.JFrame {
     private javax.swing.JSpinner vmVCPU;
     private javax.swing.JSpinner vmVCPUMax;
     // End of variables declaration//GEN-END:variables
+
+    private void createConfig(String config) {
+        
+        try {
+            Process proc = Runtime.getRuntime().exec(config);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            proc.waitFor();
+            atualizaTela.run();
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Erro em criar arquivo de configuracao da VM");
+            e.printStackTrace();
+        }
+    }
+
+    private void alterarConfig(String vmName) {
+        
+        String filePath = "/etc/xen/" + vmName + ".cfg";
+
+        String fileText = "";
+        BufferedReader br;
+        
+        try {
+            String sCurrentLine;
+            br = new BufferedReader(new FileReader(filePath));
+            while ((sCurrentLine = br.readLine()) != null) {
+                fileText += sCurrentLine + "\n";
+            }
+            
+            
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        fileText += "\nmaxvcpus = " + vmVCPUMax.getValue().toString();
+        
+//        File f = new File(filePath);
+        try (PrintWriter out = new PrintWriter(path + "configs/" + vmName + ".cfg")) {
+            
+            out.print(fileText);
+            out.flush();
+            out.close();
+            
+        } catch (Exception e) {
+            System.out.println("Impossivel criar arquivo de configuracoes");
+            e.printStackTrace();
+        }
+    }
 }

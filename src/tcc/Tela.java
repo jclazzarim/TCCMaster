@@ -7,53 +7,50 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import javax.swing.DefaultListModel;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 
 public class Tela extends javax.swing.JFrame {
 
     public static Integer portEntrada = 8910;
-    public final static DefaultListModel<ThreadServer> listModel = new DefaultListModel<>();
+    public Map<String, ThreadServer> vms = new HashMap<>();
+    public List<VMSettings> vmsList = new ArrayList<>();
+    static TimeSeries ts = new TimeSeries("data", Millisecond.class);
+    private Thread timer;
 
     public Tela() {
 
         initComponents();
         atualizar();
 
-        listModel.addListDataListener(new ListDataListener() {
-            @Override
-            public void intervalAdded(ListDataEvent e) {
-                atualizar();
-            }
-
-            @Override
-            public void intervalRemoved(ListDataEvent e) {
-                atualizar();
-            }
-
-            @Override
-            public void contentsChanged(ListDataEvent e) {
-                atualizar();
-            }
-        });
-
         new Thread(() -> {
             int x = 0;
             try (ServerSocket server = new ServerSocket(portEntrada)) {
                 while (true) {
+                    System.out.println("Entrou handShake");
                     Socket client = server.accept();
+                    System.out.println("Aceitou client");
+
                     ThreadServer vm = new ThreadServer(client);
                     vm.start();
                     Thread.sleep(1000);
-                    listModel.addElement(vm);
-                    vmList.setModel(listModel);
+                    vms.put(vm.getEntrada(), vm);
+                    System.out.println(vm.getEntrada());
                 }
             } catch (IOException ioE) {
                 System.out.println("Problemas em criar socket Server, porta ocupada?");
@@ -61,6 +58,29 @@ public class Tela extends javax.swing.JFrame {
                 System.out.println("Problemas em criar socket Server");
             }
         }).start();
+
+        TimeSeriesCollection dataset = new TimeSeriesCollection(ts);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "Processamento",
+                "Tempo",
+                "% uso",
+                dataset,
+                true,
+                true,
+                false
+        );
+        final XYPlot plot = chart.getXYPlot();
+        ValueAxis axis = plot.getDomainAxis();
+        axis.setAutoRange(true);
+        axis.setFixedAutoRange(60000.0);
+        ChartPanel label = new ChartPanel(chart);
+        this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho,
+                BoxLayout.LINE_AXIS));
+
+        this.pnlDesempenho.add(label);
+
+        this.pnlDesempenho.revalidate();
+        this.pnlDesempenho.repaint();
 
     }
 
@@ -164,7 +184,7 @@ public class Tela extends javax.swing.JFrame {
         pnlDesempenho.setLayout(pnlDesempenhoLayout);
         pnlDesempenhoLayout.setHorizontalGroup(
             pnlDesempenhoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 454, Short.MAX_VALUE)
+            .addGap(0, 628, Short.MAX_VALUE)
         );
         pnlDesempenhoLayout.setVerticalGroup(
             pnlDesempenhoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,7 +196,6 @@ public class Tela extends javax.swing.JFrame {
         jLabel1.setText("ID:");
 
         tfVmId.setEditable(false);
-        tfVmId.setText("0");
         tfVmId.setToolTipText("");
         tfVmId.setEnabled(false);
         tfVmId.setPreferredSize(new java.awt.Dimension(70, 27));
@@ -237,7 +256,7 @@ public class Tela extends javax.swing.JFrame {
                     .addGroup(pnlPropriedadesLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(manualApplyChanges, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(203, Short.MAX_VALUE))
+                .addContainerGap(375, Short.MAX_VALUE))
         );
         pnlPropriedadesLayout.setVerticalGroup(
             pnlPropriedadesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -450,54 +469,60 @@ public class Tela extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel11)
-                                .addGap(2, 2, 2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(vMemMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel13)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(memQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel12)
-                                .addGap(6, 6, 6)
-                                .addComponent(vVcpuMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(vcpuQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel13))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(verticalCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel20)
+                                        .addGap(2, 2, 2)
+                                        .addComponent(vMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel12)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(vVcpuMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(vcpuQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(6, 6, 6)))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(memQtdAlocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel15)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel16)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
                                         .addComponent(memQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel22)))))
-                        .addGap(46, 46, 46)
-                        .addComponent(jLabel15))
+                                        .addComponent(jLabel22)))
+                                .addGap(79, 79, 79))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(verticalCheckBox)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel23)
-                                        .addGap(6, 6, 6)
-                                        .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(vcpuQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel20)
-                                        .addGap(2, 2, 2)
-                                        .addComponent(vMemMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel21)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel25)))
-                        .addContainerGap())))
+                        .addComponent(jLabel23)
+                        .addGap(6, 6, 6)
+                        .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vcpuQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel25)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -526,12 +551,11 @@ public class Tela extends javax.swing.JFrame {
                     .addComponent(memQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel23)
-                        .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel24)
-                        .addComponent(jLabel25))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(vVcpuMinLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel24)
+                    .addComponent(jLabel25)
                     .addComponent(vcpuQtdDesalocacao, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(40, Short.MAX_VALUE))
         );
@@ -543,20 +567,17 @@ public class Tela extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(156, 156, 156)
-                                .addComponent(automaticApplyChanges)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(156, 156, 156)
+                        .addComponent(automaticApplyChanges))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -626,16 +647,16 @@ public class Tela extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAtualizarActionPerformed
 
     private void atualizar() {
-//        controller.atualizaLista(this.vmList);
-        vmList.validate();
-        vmList.repaint();
-        jScrollPane1.repaint();
-        jScrollPane1.revalidate();
+        controller.atualizaLista(this.vmList);
+//        vmList.validate();
+//        vmList.repaint();
+//        jScrollPane1.repaint();
+//        jScrollPane1.revalidate();
     }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
 
-        Integer vmID = this.getSelectVMId();
+        Integer vmID = this.getSelectedVMId();
 
         if (vmID == null || vmID < 0) {
             JOptionPane.showMessageDialog(null, "Nenhuma VM Selecionada");
@@ -658,54 +679,9 @@ public class Tela extends javax.swing.JFrame {
         }
 
         atualizar();
-        /**
-         * **
-         * controller.atualizarDstat(); // XYSeries serie = new
-         * XYSeries("Desempenho"); // serie.add(1,1); // serie.add(2,2); //
-         * serie.add(3,3); // serie.add(4,2); // serie.add(5,1); // //
-         * XYSeriesCollection dataSet = new XYSeriesCollection(); //
-         * dataSet.addSeries(serie); // // JFreeChart chart =
-         * ChartFactory.createXYLineChart("grafico", "Tempo", "% de uso",
-         * dataSet, PlotOrientation.VERTICAL, true, true, false); ////
-         * ChartFrame panel = new ChartFrame("grafico",chart); //// ////
-         * panel.setVisible(true); //// panel.setSize(400,400); // //
-         * this.pnlDesempenho = new JPanel(); //
-         * this.pnlDesempenho.setLayout(new java.awt.BorderLayout()); // //
-         * ChartPanel panel = new ChartPanel(chart); // //
-         * this.pnlDesempenho.add(panel, BorderLayout.CENTER); //
-         * this.pnlDesempenho.validate();
-         *
-         * XYSeries serieMem = new XYSeries("Memoria"); serieMem =
-         * setaSerie(serieMem, "Memoria", 50, 4); XYSeries serieVCPU = new
-         * XYSeries("VCPU"); serieVCPU = setaSerie(serieVCPU, "VCPU", 40, 4);
-         * XYSeries limiteMinimo = new XYSeries("Limite M&iacute;nimo");
-         * limiteMinimo = setaLimites(limiteMinimo, "Limite Mínimo", 30);
-         * XYSeries limiteMaximo = new XYSeries("Limite Máximo"); limiteMaximo =
-         * setaLimites(limiteMaximo, "Limite Maximo", 70);
-         *
-         * /*serie.add(1, 1); serie.add(2, 2); serie.add(3, 3); serie.add(4,
-         * 2); serie.add(5, 1);
-         *
-         * serie2.add(1, 3); serie2.add(2, 2); serie2.add(3, 1); serie2.add(4,
-         * 2); serie2.add(5, 3); XYSeriesCollection dataSet = new
-         * XYSeriesCollection(); dataSet.addSeries(serieMem);
-         * dataSet.addSeries(serieVCPU); dataSet.addSeries(limiteMinimo);
-         * dataSet.addSeries(limiteMaximo);
-         *
-         * JFreeChart chart = ChartFactory.createXYLineChart("Gráfico", "Tempo",
-         * "% de uso", dataSet, PlotOrientation.VERTICAL, true, true, false); //
-         * ChartFrame panel = new ChartFrame("grafico",chart); // //
-         * panel.setVisible(true); // panel.setSize(400,400); // //
-         * this.pnlDesempenho = new JPanel();
-         *
-         * ChartPanel panel = new ChartPanel(chart);
-         *
-         * this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho,
-         * BoxLayout.LINE_AXIS)); this.pnlDesempenho.add(panel);
-         *
-         * this.pnlDesempenho.revalidate(); this.pnlDesempenho.repaint();
-         *
-         */
+        controller.atualizarDstat();
+
+
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void hVcpuMaxLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hVcpuMaxLimitActionPerformed
@@ -742,7 +718,8 @@ public class Tela extends javax.swing.JFrame {
 
     private void jTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTesteActionPerformed
 
-        getSelectVMId();
+        getSelectedVMId();
+
 
     }//GEN-LAST:event_jTesteActionPerformed
 
@@ -755,10 +732,11 @@ public class Tela extends javax.swing.JFrame {
         atualizar(); */
         CreateVM createVM = new CreateVM(() -> {
             atualizar();
-        }, (maxCPU, maxMemo, ip) -> {
-            System.out.println(maxCPU);
-            System.out.println(maxMemo);
-            System.out.println(ip);
+        }, (name, ip, vcpu, maxvcpu, memory, maxMemory) -> {
+
+            VMSettings vmSettings = new VMSettings(name, ip, vcpu, maxvcpu, memory, maxMemory);
+            vmsList.add(vmSettings);
+
         });
         createVM.setLocationRelativeTo(null);
         createVM.setVisible(true);
@@ -768,18 +746,47 @@ public class Tela extends javax.swing.JFrame {
 
     private void vmListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_vmListValueChanged
 
-        Integer vmId = evt.getFirstIndex();
+        Integer vmId = getSelectedVMId();
 
-        tfVmId.setText(vmId.toString());
+        if (vmId == null) {
+            tfVmId.setText("");
+        } else {
+            tfVmId.setText(vmId.toString());
+        }
+
+        final ThreadServer thread = getSelectedThread();
+
+//        if(timer != null){
+//            timer.interrupt();
+//        }
+        timer = new Thread(() -> {
+            while (true) {
+                final Integer actualCPU = thread.getActualCPU();
+                ts.addOrUpdate(new Millisecond(), actualCPU);
+                System.out.println(actualCPU);
+            }
+        });
+
+        timer.start();
 
     }//GEN-LAST:event_vmListValueChanged
 
-    public Integer getSelectVMId() {
+    private ThreadServer getSelectedThread() {
+        Object selectedItem = this.vmList.getSelectedValue();
+        final String[] id = selectedItem.toString().split(" ");
+        return vms.get(id[2]);
+    }
+
+    private Integer getSelectedVMId() {
 
         Object selectedItem = this.vmList.getSelectedValue();
+        final String[] id = selectedItem.toString().split(" ");
+        Integer vmID = selectedItem == null ? null : new Integer(id[0]);
 
-        Integer vmID = selectedItem == null ? null : new Integer(selectedItem.toString().split(" ")[0]);
-
+        ThreadServer thread = vms.get(id[2]);
+        if (thread != null) {
+            System.out.println(thread.toString());
+        }
         return vmID;
     }
 
@@ -947,4 +954,13 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JCheckBox verticalCheckBox;
     private javax.swing.JList vmList;
     // End of variables declaration//GEN-END:variables
+
+    public VMSettings searchSettingsByIP(String IP) {
+        for (VMSettings vmS : vmsList) {
+            if (vmS.getVmIP().equals(IP)) {
+                return vmS;
+            }
+        }
+        return null;
+    }
 }
