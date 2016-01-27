@@ -6,9 +6,7 @@ package tcc;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import javax.swing.BoxLayout;
@@ -20,7 +18,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.Millisecond;
+import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
@@ -29,15 +27,44 @@ public class Tela extends javax.swing.JFrame {
 
     public static Integer portEntrada = 8910;
     public Map<String, ThreadServer> vms = new HashMap<>();
-    public List<VMSettings> vmsList = new ArrayList<>();
-    static TimeSeries ts = new TimeSeries("data", Millisecond.class);
+    public Map<String, VMSettings> vmsSettings = new HashMap<>();
+    final static TimeSeries tsCPU = new TimeSeries("CPU", Second.class);
+    final static TimeSeries tsMem = new TimeSeries("Memória", Second.class);
     private Thread timer;
+    private XYPlot plot;
 
     public Tela() {
-
         initComponents();
+        plotGraph();
+        startHandShake();
         atualizar();
+    }
 
+    private void plotGraph() {
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(tsMem);
+        dataset.addSeries(tsCPU);
+
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "", "Tempo", "% uso", dataset, true, true, false
+        );
+
+        plot = chart.getXYPlot();
+        ValueAxis rangeAxis = plot.getRangeAxis();
+        rangeAxis.setRange(0.0, 100.0);
+        final ValueAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setAutoRange(true);
+        domainAxis.setFixedAutoRange(60000.0);
+        ChartPanel label = new ChartPanel(chart);
+        this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho,
+                BoxLayout.LINE_AXIS));
+        pnlDesempenho.removeAll();
+        this.pnlDesempenho.add(label);
+        this.pnlDesempenho.revalidate();
+        this.pnlDesempenho.repaint();
+    }
+
+    private void startHandShake() {
         new Thread(() -> {
             int x = 0;
             try (ServerSocket server = new ServerSocket(portEntrada)) {
@@ -58,30 +85,6 @@ public class Tela extends javax.swing.JFrame {
                 System.out.println("Problemas em criar socket Server");
             }
         }).start();
-
-        TimeSeriesCollection dataset = new TimeSeriesCollection(ts);
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                "Processamento",
-                "Tempo",
-                "% uso",
-                dataset,
-                true,
-                true,
-                false
-        );
-        final XYPlot plot = chart.getXYPlot();
-        ValueAxis axis = plot.getDomainAxis();
-        axis.setAutoRange(true);
-        axis.setFixedAutoRange(60000.0);
-        ChartPanel label = new ChartPanel(chart);
-        this.pnlDesempenho.setLayout(new BoxLayout(pnlDesempenho,
-                BoxLayout.LINE_AXIS));
-
-        this.pnlDesempenho.add(label);
-
-        this.pnlDesempenho.revalidate();
-        this.pnlDesempenho.repaint();
-
     }
 
     Controller controller = new Controller();
@@ -476,9 +479,7 @@ public class Tela extends javax.swing.JFrame {
                                 .addComponent(vMemMaxLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel13))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(verticalCheckBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(verticalCheckBox)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -561,6 +562,11 @@ public class Tela extends javax.swing.JFrame {
         );
 
         automaticApplyChanges.setText("Aplicar Alterações");
+        automaticApplyChanges.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                automaticApplyChangesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -576,7 +582,7 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(automaticApplyChanges))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 582, Short.MAX_VALUE)))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -674,7 +680,7 @@ public class Tela extends javax.swing.JFrame {
             Process proc = Runtime.getRuntime().exec(command);
 
         } catch (Exception e) {
-            System.out.println("Erro em create new VM");
+            System.out.println("Erro em desligar VM");
             e.printStackTrace();
         }
 
@@ -735,7 +741,7 @@ public class Tela extends javax.swing.JFrame {
         }, (name, ip, vcpu, maxvcpu, memory, maxMemory) -> {
 
             VMSettings vmSettings = new VMSettings(name, ip, vcpu, maxvcpu, memory, maxMemory);
-            vmsList.add(vmSettings);
+            vmsSettings.put(name, vmSettings);
 
         });
         createVM.setLocationRelativeTo(null);
@@ -746,40 +752,82 @@ public class Tela extends javax.swing.JFrame {
 
     private void vmListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_vmListValueChanged
 
+//        plotGraph();
         Integer vmId = getSelectedVMId();
 
         if (vmId == null) {
             tfVmId.setText("");
+            return;
         } else {
             tfVmId.setText(vmId.toString());
         }
 
         final ThreadServer thread = getSelectedThread();
 
-//        if(timer != null){
-//            timer.interrupt();
-//        }
+        if (timer != null) {
+            timer.interrupt();
+            tsCPU.clear();
+            tsMem.clear();
+        }
+
         timer = new Thread(() -> {
-            while (true) {
+            while (!Thread.interrupted()) {
                 final Integer actualCPU = thread.getActualCPU();
-                ts.addOrUpdate(new Millisecond(), actualCPU);
-                System.out.println(actualCPU);
+                final Integer actualMem = thread.getActualMemory();
+                synchronized (tsCPU) {
+                    tsCPU.addOrUpdate(new Second(), actualCPU);
+                }
+                synchronized (tsMem) {
+                    tsMem.addOrUpdate(new Second(), actualMem);
+                }
             }
         });
 
         timer.start();
-
+        setDadosTelaPropriedadeManual();
     }//GEN-LAST:event_vmListValueChanged
 
+    private void automaticApplyChangesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_automaticApplyChangesActionPerformed
+        ThreadServer thread = getSelectedThread();
+        if (thread == null) {
+            return;
+        }
+        thread.setVertical(verticalCheckBox.isSelected());
+        thread.setAlocalMemoria(vMemMaxLimit.getText(), memQtdAlocacao.getText());
+        thread.setAlocarCPU(vVcpuMaxLimit.getText(), vcpuQtdAlocacao.getText());
+        thread.setDesalocarMemoria(vMemMinLimit.getText(), memQtdDesalocacao.getText());
+        thread.serDesalocarCPU(vVcpuMinLimit.getText(), vcpuQtdDesalocacao.getText());
+    }//GEN-LAST:event_automaticApplyChangesActionPerformed
+
+    private void setDadosTelaPropriedadeManual() throws NumberFormatException {
+        VMSettings sett = vmsSettings.get(getSelectedVMName());
+        if (sett == null) {
+            return;
+        }
+
+        vcpuSpinner.setValue(Integer.parseInt(sett.getVmVCPU()));
+        vcpuSpinner.setMaximum(Integer.parseInt(sett.getVmMaxVCPU()));
+        memorySpinner.setValue(Integer.parseInt(sett.getVmMemory()));
+        memorySpinner.setMaximum(Integer.parseInt(sett.getVmMaxMemory()));
+    }
+
     private ThreadServer getSelectedThread() {
+        return vms.get(getSelectedVMName());
+    }
+
+    private String getSelectedVMName() {
         Object selectedItem = this.vmList.getSelectedValue();
         final String[] id = selectedItem.toString().split(" ");
-        return vms.get(id[2]);
+        return id[2];
     }
 
     private Integer getSelectedVMId() {
 
         Object selectedItem = this.vmList.getSelectedValue();
+        if (selectedItem == null) {
+            return null;
+        }
+
         final String[] id = selectedItem.toString().split(" ");
         Integer vmID = selectedItem == null ? null : new Integer(id[0]);
 
@@ -955,12 +1003,4 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JList vmList;
     // End of variables declaration//GEN-END:variables
 
-    public VMSettings searchSettingsByIP(String IP) {
-        for (VMSettings vmS : vmsList) {
-            if (vmS.getVmIP().equals(IP)) {
-                return vmS;
-            }
-        }
-        return null;
-    }
 }

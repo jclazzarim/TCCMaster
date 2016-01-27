@@ -23,6 +23,63 @@ public class Controller {
     private VM server;
     List<VM> vms;
 
+//    public void atualizar() {
+//        String command;
+//        command = "sudo xl list";
+//
+//        Process proc;
+//        try {
+//            proc = Runtime.getRuntime().exec(command);
+//
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+//
+//            String line;
+//            List<String> vmsInfo = new ArrayList<>();
+//
+//            while ((line = reader.readLine()) != null) {
+//                vmsInfo.add(line);
+//            }
+//
+//            proc.waitFor();
+//
+//            List<String[]> infoVM = new ArrayList<>();
+//            for (int i =1 ; i < vmsInfo.size(); i++) {
+//                String s = vmsInfo.get(i).replace("|", " ");
+//                String[] str = s.split(" ");
+//                
+//                if (str[0].equals())
+//                
+//                String[] strClear = new String[6];
+//                int pos = 0;
+//                for (String str1 : str) {
+//                    if (!str1.isEmpty()) {
+//                        strClear[pos] = str1;
+//                        pos++;
+//                    }
+//                }
+//                    
+//                infoVM.add(strClear);
+//                
+//            }
+//                int a =0;
+//            
+//            
+//            
+//            server = new VM(vmsInfo.get(1));
+//
+//            vms = new ArrayList<>();
+//            for (int i = 2; i < vmsInfo.size(); i++) {
+//                VM vm = new VM(vmsInfo.get(i));
+//                vms.add(vm);
+//            }
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//            System.out.println("Erro ao tentar Atualizar");
+//        }
+//    }
+    
+    
+    
     public void atualizar() {
         String command;
         command = "sudo xl list";
@@ -54,6 +111,8 @@ public class Controller {
             System.out.println("Erro ao tentar Atualizar");
         }
     }
+    
+    
 
     public void atualizaLista(JList l) {
         atualizar();

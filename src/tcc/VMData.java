@@ -8,23 +8,23 @@ import java.io.Serializable;
 public class VMData implements Serializable {
 
     private String domain;
-    private String cpuLivre;
-    private String memUsada;
+    private Integer cpuOcupada;
+    private Integer memUsada;
     private String memLivre;
 
-    public String getCpuLivre() {
-        return cpuLivre;
+    public Integer getCpuOcupada() {
+        return cpuOcupada;
     }
 
-    public void setCpuLivre(String cpuLivre) {
-        this.cpuLivre = cpuLivre;
+    public void setCpuOcupada(Integer cpuOcupada) {
+        this.cpuOcupada = cpuOcupada;
     }
 
-    public String getMemUsada() {
+    public Integer getMemUsada() {
         return memUsada;
     }
 
-    public void setMemUsada(String memUsada) {
+    public void setMemUsada(Integer memUsada) {
         this.memUsada = memUsada;
     }
 
@@ -50,7 +50,7 @@ public class VMData implements Serializable {
         sb.append("Dominio: ");
         sb.append(getDomain());
         sb.append(" | CPU Livre: ");
-        sb.append(getCpuLivre());
+        sb.append(getCpuOcupada());
         sb.append(" | Memo Usada: ");
         sb.append(getMemUsada());
         sb.append(" | Memo Livre: ");

@@ -537,7 +537,7 @@
                                           <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="vMemMaxLimit" min="-2" pref="36" max="-2" attributes="0"/>
-                                          <EmptySpace pref="21" max="32767" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
                                           <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="verticalCheckBox" min="-2" max="-2" attributes="0"/>
@@ -769,6 +769,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Aplicar Altera&#xe7;&#xf5;es"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="automaticApplyChangesActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
