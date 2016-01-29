@@ -275,7 +275,7 @@ public class CreateVM extends javax.swing.JFrame {
         " --hostname " + vmName.getText() +
         " --ip 192.168.122." + vmIP.getValue().toString() +
         " --nopasswd" +
-        " --dir /home/server/Documentos/magica/hds/" +
+        " --dir /home/server/Documentos/magica/hds" +
         " --force " +
         " --install-method=copy " +
         " --install-source=/home/server/Documentos/magica/IMAGEM_OFICIAL/montada/ " +

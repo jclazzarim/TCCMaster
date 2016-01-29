@@ -31,6 +31,7 @@ public class ThreadServer extends Thread {
     private static final int TAM_FILA = 5;
     public Integer memTotal;
     private boolean isVerticalEnable;
+    private boolean isHorizontalEnable;
     private int memLimitMaxPercent;
     private int memQuantAloca;
     private int cpuLimitMaxPercent;
@@ -85,7 +86,7 @@ public class ThreadServer extends Thread {
 
                     data.setMemLivre(cleanList.get(10));
                     data.setMemUsada(getPercentMemUsada(data.getMemLivre()));
-
+ 
                     this.dataActual = data;
 
                     getDatas().add(data);
@@ -93,7 +94,13 @@ public class ThreadServer extends Thread {
                         getDatas().poll();
                     }
 
-                    verificaElasticidadeVertical();
+                    if (isVerticalEnable) {
+                        elasticidadeVertical();
+                    }else {
+                        if (isHorizontalEnable) {
+                            elasticidadeHorizontal();
+                        }
+                    }
 
                     saida.println(true);
                 } catch (Exception e) {
@@ -105,39 +112,36 @@ public class ThreadServer extends Thread {
         }
     }
 
-    private void verificaElasticidadeVertical() {
-        if (isVerticalEnable) {
-            int sumCpu = 0;
-            int sumMem = 0;
-            for (VMData vmData : getDatas()) {
-                sumCpu += vmData.getCpuOcupada();
-                sumMem += vmData.getMemUsada();
-            }
-            List<String> xlList = executaXlList();
+    private void elasticidadeVertical() {
+        int sumCpu = 0;
+        int sumMem = 0;
+        for (VMData vmData : getDatas()) {
+            sumCpu += vmData.getCpuOcupada();
+            sumMem += vmData.getMemUsada();
+        }
+        List<String> xlList = executaXlList();
 
-            int cpuAtual = Integer.parseInt(xlList.get(3));
-            int memAtual = Integer.parseInt(xlList.get(2));
+        int cpuAtual = Integer.parseInt(xlList.get(3));
+        int memAtual = Integer.parseInt(xlList.get(2));
 
-            if (cpuLimitMaxPercent < (sumCpu / getDatas().size())) {
-                final String aloc = "sudo xl vcpu-set " + getEntrada() + " " + (cpuQuantAloca + cpuAtual);
-                executaComando(aloc);
-                System.out.println(aloc);
-            } else if (cpuLimitMinPercent > (sumCpu / getDatas().size())) {
-                final String desaloc = "sudo xl vcpu-set " + getEntrada() + " " + (cpuAtual - cpuQuantDesaloca);
-                executaComando(desaloc);
-                System.out.println(desaloc);
-            }
+        if (cpuLimitMaxPercent < (sumCpu / getDatas().size())) {
+            final String aloc = "sudo xl vcpu-set " + getEntrada() + " " + (cpuQuantAloca + cpuAtual);
+            executaComando(aloc);
+            System.out.println(aloc);
+        } else if (cpuLimitMinPercent > (sumCpu / getDatas().size())) {
+            final String desaloc = "sudo xl vcpu-set " + getEntrada() + " " + (cpuAtual - cpuQuantDesaloca);
+            executaComando(desaloc);
+            System.out.println(desaloc);
+        }
 
-            if (memLimitMaxPercent < (sumMem / getDatas().size())) {
-                final String aloc = "sudo xl mem-set " + getEntrada() + " " + (memQuantAloca + memAtual);
-                executaComando(aloc);
-                System.out.println(aloc);
-            } else if (memLimitMinPercent > (sumMem / getDatas().size())) {
-                final String desaloc = "sudo xl mem-set " + getEntrada() + " " + (memAtual - memQuantDesaloca);
-                executaComando(desaloc);
-                System.out.println(desaloc);
-            }
-
+        if (memLimitMaxPercent < (sumMem / getDatas().size())) {
+            final String aloc = "sudo xl mem-set " + getEntrada() + " " + (memQuantAloca + memAtual);
+            executaComando(aloc);
+            System.out.println(aloc);
+        } else if (memLimitMinPercent > (sumMem / getDatas().size())) {
+            final String desaloc = "sudo xl mem-set " + getEntrada() + " " + (memAtual - memQuantDesaloca);
+            executaComando(desaloc);
+            System.out.println(desaloc);
         }
     }
 
@@ -243,5 +247,11 @@ public class ThreadServer extends Thread {
     void serDesalocarCPU(String cpuLimitMinPercent, String cpuQuantDesaloca) {
         this.cpuLimitMinPercent = Integer.parseInt(cpuLimitMinPercent);
         this.cpuQuantDesaloca = Integer.parseInt(cpuQuantDesaloca);
+    }
+
+    private void elasticidadeHorizontal() {
+
+        
+        
     }
 }
