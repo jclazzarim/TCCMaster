@@ -6,12 +6,15 @@ package tcc;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -150,7 +153,6 @@ public class Tela extends javax.swing.JFrame {
         vcpuQtdDesalocacao = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
         automaticApplyChanges = new javax.swing.JButton();
-        jTeste = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -334,10 +336,10 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel17.setText("Desalocar uma nova máquina virtual quando limites atingirem:");
 
-        hMemMinLimit.setText("40");
+        hMemMinLimit.setText("50");
         hMemMinLimit.setEnabled(false);
 
-        hVcpuMinLimit.setText("45");
+        hVcpuMinLimit.setText("30");
         hVcpuMinLimit.setEnabled(false);
         hVcpuMinLimit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -464,7 +466,7 @@ public class Tela extends javax.swing.JFrame {
 
         jLabel23.setText("Quando a carga no CPU for menor que");
 
-        vVcpuMinLimit.setText("40");
+        vVcpuMinLimit.setText("30");
         vVcpuMinLimit.setEnabled(false);
 
         jLabel24.setText("%, desalocar");
@@ -600,13 +602,6 @@ public class Tela extends javax.swing.JFrame {
 
         painel.addTab("Propriedades Automáticas", jPanel2);
 
-        jTeste.setText("Teste");
-        jTeste.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTesteActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -625,8 +620,6 @@ public class Tela extends javax.swing.JFrame {
                         .addComponent(btnExcluir)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAtualizar)
-                        .addGap(61, 61, 61)
-                        .addComponent(jTeste)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -636,8 +629,7 @@ public class Tela extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNovo)
                     .addComponent(btnExcluir)
-                    .addComponent(btnAtualizar)
-                    .addComponent(jTeste))
+                    .addComponent(btnAtualizar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(painel)
@@ -662,7 +654,9 @@ public class Tela extends javax.swing.JFrame {
     }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-
+        
+        LocalTime inicio = LocalTime.now();
+        
         Integer vmID = this.getSelectedVMId();
 
         if (vmID == null || vmID < 0) {
@@ -687,7 +681,9 @@ public class Tela extends javax.swing.JFrame {
 
         atualizar();
         controller.atualizarDstat();
-
+        
+        LocalTime fim = LocalTime.now();
+        System.out.println("Tempo para desalocar VM manualmente: " + (fim.toSecondOfDay()-inicio.toSecondOfDay()) + " segundos.");
 
     }//GEN-LAST:event_btnExcluirActionPerformed
 
@@ -735,13 +731,6 @@ public class Tela extends javax.swing.JFrame {
     private void vMemMinLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vMemMinLimitActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_vMemMinLimitActionPerformed
-
-    private void jTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTesteActionPerformed
-
-        getSelectedVMId();
-
-
-    }//GEN-LAST:event_jTesteActionPerformed
 
     private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
 
@@ -808,11 +797,22 @@ public class Tela extends javax.swing.JFrame {
         if (thread == null) {
             return;
         }
-        thread.setVertical(verticalCheckBox.isSelected());
-        thread.setAlocalMemoria(vMemMaxLimit.getText(), memQtdAlocacao.getText());
-        thread.setAlocarCPU(vVcpuMaxLimit.getText(), vcpuQtdAlocacao.getText());
-        thread.setDesalocarMemoria(vMemMinLimit.getText(), memQtdDesalocacao.getText());
-        thread.serDesalocarCPU(vVcpuMinLimit.getText(), vcpuQtdDesalocacao.getText());
+        
+        if (verticalCheckBox.isSelected()) { 
+            thread.setVertical(true);
+            thread.setHorizontal(false);
+            thread.setAlocarMemoria(vMemMaxLimit.getText(), memQtdAlocacao.getText());
+            thread.setAlocarCPU(vVcpuMaxLimit.getText(), vcpuQtdAlocacao.getText());
+            thread.setDesalocarMemoria(vMemMinLimit.getText(), memQtdDesalocacao.getText());
+            thread.serDesalocarCPU(vVcpuMinLimit.getText(), vcpuQtdDesalocacao.getText());
+        } else {
+            if (horizontalCheckBox.isSelected()) {
+                thread.setVertical(false);
+                thread.setHorizontal(true);
+                thread.setAlocaVM(hMemMaxLimit.getText(), hVcpuMaxLimit.getText());
+                thread.setDesalocaVM(hMemMinLimit.getText(), hVcpuMinLimit.getText());
+            }
+        }
     }//GEN-LAST:event_automaticApplyChangesActionPerformed
 
     private void memQtdDesalocacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memQtdDesalocacaoActionPerformed
@@ -962,6 +962,7 @@ public class Tela extends javax.swing.JFrame {
 //                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 //                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            
         } catch (Exception e) {
             System.out.println("Problema em aplicar look and feel");
         }
@@ -1013,7 +1014,6 @@ public class Tela extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton jTeste;
     private javax.swing.JButton manualApplyChanges;
     private javax.swing.JTextField memQtdAlocacao;
     private javax.swing.JTextField memQtdDesalocacao;

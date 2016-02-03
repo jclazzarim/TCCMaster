@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.time.LocalTime;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 
@@ -24,31 +25,31 @@ public class CreateVM extends javax.swing.JFrame {
         SpinnerNumberModel smVCPUMax = new SpinnerNumberModel();
         smVCPUMax.setMinimum(1);
         smVCPUMax.setMaximum(32);
-        smVCPUMax.setValue(2);
+        smVCPUMax.setValue(4);
         vmVCPUMax.setModel(smVCPUMax);
 
         SpinnerNumberModel smVCPU = new SpinnerNumberModel();
         smVCPU.setMinimum(1);
-        smVCPU.setMaximum(2);
-        smVCPU.setValue(1);
+        smVCPU.setMaximum(4);
+        smVCPU.setValue(2);
         vmVCPU.setModel(smVCPU);
 
         SpinnerNumberModel smMemMax = new SpinnerNumberModel();
         smMemMax.setMinimum(512);
         smMemMax.setMaximum(32768);       // 32Gb
-        smMemMax.setValue(2048);
+        smMemMax.setValue(4096);
         vmMemMax.setModel(smMemMax);
 
         SpinnerNumberModel smMem = new SpinnerNumberModel();
         smMem.setMinimum(512);
-        smMem.setMaximum(2048);
-        smMem.setValue(1024);
+        smMem.setMaximum(32768);
+        smMem.setValue(2048);
         vmMem.setModel(smMem);
         
         SpinnerNumberModel smIP = new SpinnerNumberModel();
         smIP.setMinimum(2);
         smIP.setMaximum(254);
-        smIP.setValue(2);
+        smIP.setValue(100);
         vmIP.setModel(smIP);
         
         
@@ -265,6 +266,8 @@ public class CreateVM extends javax.swing.JFrame {
 
     private void btnCreateVMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateVMActionPerformed
 
+        LocalTime inicio = LocalTime.now();
+        
         if (!isConfigOk()) {
             return;
         }
@@ -302,6 +305,9 @@ public class CreateVM extends javax.swing.JFrame {
 
 //        INICIA A VM
         startVM(vmName.getText());
+        
+        LocalTime fim = LocalTime.now();
+        System.out.println("Tempo para alocar VM manualmente: " + (fim.toSecondOfDay()-inicio.toSecondOfDay()) + " segundos.");
         
         this.dispose();
 
@@ -404,7 +410,6 @@ public class CreateVM extends javax.swing.JFrame {
         
         fileText += "\nmaxvcpus = " + vmVCPUMax.getValue().toString();
         
-//        File f = new File(filePath);
         try (PrintWriter out = new PrintWriter(path + "configs/" + vmName + ".cfg")) {
             
             out.print(fileText);

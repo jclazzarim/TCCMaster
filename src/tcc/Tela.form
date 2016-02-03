@@ -38,8 +38,6 @@
                       <Component id="btnExcluir" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnAtualizar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
-                      <Component id="jTeste" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -54,7 +52,6 @@
                   <Component id="btnNovo" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnExcluir" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnAtualizar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTeste" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -490,13 +487,13 @@
                 </Component>
                 <Component class="javax.swing.JTextField" name="hMemMinLimit">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="40"/>
+                    <Property name="text" type="java.lang.String" value="50"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="hVcpuMinLimit">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="45"/>
+                    <Property name="text" type="java.lang.String" value="30"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                   <Events>
@@ -743,7 +740,7 @@
                 </Component>
                 <Component class="javax.swing.JTextField" name="vVcpuMinLimit">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="40"/>
+                    <Property name="text" type="java.lang.String" value="30"/>
                     <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </Component>
@@ -777,13 +774,5 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="jTeste">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Teste"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTesteActionPerformed"/>
-      </Events>
-    </Component>
   </SubComponents>
 </Form>
