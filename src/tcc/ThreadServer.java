@@ -60,7 +60,7 @@ public class ThreadServer extends Thread {
     public void run() {
         try {
             String ipClient = client.getInetAddress().getHostAddress();
-            this.vmFilhoIP = 200;
+            this.vmFilhoIP = 201;
             System.out.println("Conexao com o cliente:" + ipClient);
 
             System.out.println(vmFilhoName + ": " + vmFilhoIP);
@@ -136,7 +136,12 @@ public class ThreadServer extends Thread {
          || memLimitMaxPercent < (sumMem / getDatas().size()))
          && qtdVMFilhoAtual < qtdVMFilhoMax ) {
             
-            JOptionPane.showMessageDialog(null,"Alocando vm " + vmFilhoName);
+            Runnable avisaAlocacao = () -> {
+                JOptionPane.showMessageDialog(null,"Alocando vm " + vmFilhoName);
+            };
+            
+            Thread tAviso = new Thread (avisaAlocacao);
+            tAviso.start();
             
             this.qtdVMFilhoAtual = 1;
             
@@ -144,8 +149,8 @@ public class ThreadServer extends Thread {
                 alocarVM();
             };
             
-            Thread t = new Thread (alocarNovaVM);
-            t.start();
+            Thread tAloca = new Thread (alocarNovaVM);
+            tAloca.start();
             
         } else if (qtdVMFilhoAtual > 0
              && cpuLimitMaxPercent > (sumCpu / getDatas().size())
